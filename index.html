@@ -126,13 +126,15 @@
 </head>
 
 <body>
+
     <h1>State Forest Trails Map</h1>
+
     <div id="map"></div>
 
     <!-- ui-controls div is selected by the JS and dynamically added to the map -->
   	<div id='ui-controls'>
   		<label>Choose Recreatation Type:</label>
-  		<select id="employment">
+  		<select id="trails">
   			<option value="SUMMER_M" selected>Summer Motorized</option>
   			<option value="SUMMER_NM">Summer Non-Motorized</option>
   			<option value="WINTER_M">Winter Motorized</option>
@@ -157,9 +159,11 @@
 
         // ####### CREATE THE LEAFLET MAP #######
         var map = L.map('map', options);
-
             // ####### ADD ZOOM CONTROL TO BOTTOM-RIGHT OF MAP #######
-            map.addControl( L.control.zoom({position: 'bottomright'}) )
+            map.addControl(L.control.zoom({position: 'bottomright'}) )
+
+        // ####### SET GLOBAL VARIABLE FOR TRAIL LAYER #######
+        var attributeValue = "SUMMER_M"
 
         // ####### REQUEST TILES & ADD TO MAP #######
         var tiles = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain-background/{z}/{x}/{y}.{ext}'    , {
@@ -177,64 +181,103 @@
 
         function drawMap(data) {
 
-          // create Leaflet data layer and add to map
+          // ####### CREATE LEAFLET DATA LAYER #######
           var dataLayer = L.geoJson(data, {
+            filter: function(feature) {
+                if (feature.properties.SUMMER_M == "Yes") return true
+              },
             style: function(feature) {
-              // style counties with initial default path options
+              // ####### DEFAULT TRAILS LAYER STYLE #######
               return {
-                color: 'black',
-                weight: 2,
+                color: 'blue',
+                weight: 2
               };
             },
+
             onEachFeature: function(feature, layer) {
 
-              // when mousing over a layer
+              // ####### WHEN MOUSING OVER LAYER TRAILS
               layer.on('mouseover', function() {
 
-                // change the stroke color and bring that element to the front
+                // ####### CHANGE STROKE COLOR & BRING TO FRONT #######
                 layer.setStyle({
                   color: 'yellow'
                 }).bringToFront();
               });
 
-              // on mousing off layer
+              // ####### ON MOUSING OFF LAYER #######
               layer.on('mouseout', function() {
 
-                // reset the layer style to its original stroke color
+                // ####### RESET LAYER STYLE TO ORIGIANL COLOR #######
                 layer.setStyle({
-                  color: 'black'
+                  color: 'blue'
                 });
               });
             }
-          }).addTo(map);
+          }).addTo(map); // ####### ADD IT TO MAP #######
 
-          // fit the map's bounds and zoom level using the dataLayer extent
+          // ####### FIT MAP BOUNDS TO EXTENT OF TRAILS LAYER #######
           map.fitBounds(dataLayer.getBounds(), {
+            // #######  ????????? IS THE NEEDED ????????? #######
             paddingTopLeft: [25, 25] // push off top left for sake of legend
           });
 
-          addUi(dataLayer); // add the UI controls
-          // updateMap(dataLayer); // update the map with the current data attribute
+          addUi(dataLayer); // ####### CALL addUI function #######
+          updateMap(dataLayer); // ####### CALL updateMap function #######
 
         }
 
+        // ####### UPDATE MAP W/ CURRENT DATA ATTRIBUTE #######
+        function updateMap (dataLayer) {
+    			// get the class breaks for the current data attribute
+    			// var breaks = getClassBreaks(dataLayer);
+
+    			// addLegend(breaks); // add the legend to the map using breaks
+
+    			// ####### LOOP THROUGH EACH IN TRAIL LAYER to UPDATE THE COLOR & TOOLTIP HTML #######
+    			dataLayer.eachLayer(function(layer) {
+
+    				var props = layer.feature.properties;
+
+    				// ####### set the fill color of layer based on its normalized data value
+    				// layer.setStyle({
+    				// 	  color: getColor(props[attributeValue])
+    				// });
+
+    				// assemble string sequence of info for tooltip (end line break with + operator)
+    				var tooltipInfo = "<b>" + props["Primary_Na"] + "</b></br>" +
+    													"Class: " + props["Trail_Clas"] + "</br>" +
+                              "Difficulty: " + props["Difficulty"] + "</br>" +
+                              "Surface: " + props["Surface"];
+
+    				// bind a tooltip to layer with county-specific information
+    				layer.bindTooltip(tooltipInfo, {
+      					// sticky property so tooltip follows the mouse
+      					sticky: true,
+      					tooltipAnchor: [200, 200]
+    				});
+
+    			});
+    		}
+
+
         function addUi(dataLayer) {
 
-    		  	// create the slider control
+    		  	// ####### CREATE THE UI CONTROL #######
     		  	var selectControl = L.control({ position: 'topright'} );
 
-    		  	// when control is added
+    		  	// ####### WHEN CONTROL IS ADDED #######
     		  	selectControl.onAdd = function(map) {
-    		    		// get the element with id attribute of ui-controls
+    		    		// ####### GET THE ELEMENT W/ ID ATTRIBUTE OF 'ui-controls' #######
     		    		return L.DomUtil.get("ui-controls");
     		  	}
-    		  	// add the control to the map
+    		  	// ####### ADD UI CONTROL TO THE MAP #######
     		  	selectControl.addTo(map);
 
-    				$('select[id="employment"]').change(function() {
-      					// code executed here when change event occurs
+    				$('select[id="trails"]').change(function() {
+      					// ####### CODE EXCUTED HERE WHEN CHANGE EVENT OCCURS #######
       					attributeValue = this.value;
-    						// call update function
+    						// ####### CALL updateMap function #######
     						updateMap(dataLayer);
     				});
 
