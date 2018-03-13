@@ -103,10 +103,6 @@
             margin-right: -15px;
         }
 
-        .year-slider {
-            width: 100%;
-        }
-
         label {
             font-size: 1.1em;
             font-weight: bold;
@@ -172,10 +168,10 @@
             ext: 'png'
         }).addTo(map);
 
-        // AJAX call to load county-level data
+        // ####### AJAX CALL TO LOAD TRAILS DATA #######
         $.getJSON("data/trails.geojson", function(data) {
 
-          drawMap(data); // draw the map using GeoJSON data
+          drawMap(data); // ####### CALL drawMap FUCTION #######
 
         });
 
@@ -197,7 +193,7 @@
 
           // ####### FIT MAP BOUNDS TO EXTENT OF TRAILS LAYER #######
           map.fitBounds(dataLayer.getBounds(), {
-            // #######  ????????? IS THE NEEDED ????????? #######
+            // #######  ????????? IS THIS NEEDED ????????? #######
             paddingTopLeft: [25, 25] // push off top left for sake of legend
           });
 
@@ -208,8 +204,6 @@
 
         // ####### UPDATE MAP W/ CURRENT DATA ATTRIBUTE #######
         function updateMap (dataLayer) {
-    			// get the class breaks for the current data attribute
-    			// var breaks = getClassBreaks(dataLayer);
 
     			// addLegend(breaks); // add the legend to the map using breaks
 
@@ -249,15 +243,15 @@
 
           }).addTo(map); // ####### ADD IT TO MAP #######
 
-    				// assemble string sequence of info for tooltip (end line break with + operator)
+    				// ####### HTML STRING FOR TOOLTIP DISPLAY #######
     				var tooltipInfo = "<b>" + props["Primary_Na"] + "</b></br>" +
     													"Class: " + props["Trail_Clas"] + "</br>" +
                               "Difficulty: " + props["Difficulty"] + "</br>" +
                               "Surface: " + props["Surface"];
 
-    				// bind a tooltip to layer with county-specific information
+    				// ####### BIND TOOLTIP TO LAYER #######
     				layer.bindTooltip(tooltipInfo, {
-      					// sticky property so tooltip follows the mouse
+      					// ####### STICKY PROPERTY SO TOOLTIP FOLLOWS THE MOUSE #######
       					sticky: true,
       					tooltipAnchor: [200, 200]
     				});
@@ -266,10 +260,8 @@
     		}
 
 
+        // ####### SELECTS COLOR OF TRAILS BASED ON 'attributeValue' VARIBALE #######
         function getColor(attributeValue) {
-    			// function accepts a single normalized data attribute value
-    			// and uses a series of conditional statements to determine which
-    			// which color value to return to return to the function caller
 
     			if (attributeValue == "SUMMER_M") {
     				return 'blue';
