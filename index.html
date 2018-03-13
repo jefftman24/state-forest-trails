@@ -193,27 +193,6 @@
                 weight: 2
               };
             },
-
-            onEachFeature: function(feature, layer) {
-
-              // ####### WHEN MOUSING OVER LAYER TRAILS
-              layer.on('mouseover', function() {
-
-                // ####### CHANGE STROKE COLOR & BRING TO FRONT #######
-                layer.setStyle({
-                  color: 'yellow'
-                }).bringToFront();
-              });
-
-              // ####### ON MOUSING OFF LAYER #######
-              layer.on('mouseout', function() {
-
-                // ####### RESET LAYER STYLE TO ORIGIANL COLOR #######
-                layer.setStyle({
-                  color: 'blue'
-                });
-              });
-            }
           }).addTo(map); // ####### ADD IT TO MAP #######
 
           // ####### FIT MAP BOUNDS TO EXTENT OF TRAILS LAYER #######
@@ -234,15 +213,41 @@
 
     			// addLegend(breaks); // add the legend to the map using breaks
 
-    			// ####### LOOP THROUGH EACH IN TRAIL LAYER to UPDATE THE COLOR & TOOLTIP HTML #######
+    			// ####### LOOP THROUGH LAYER TO UPDATE FILTER, COLOR & TOOLTIP #######
     			dataLayer.eachLayer(function(layer) {
 
     				var props = layer.feature.properties;
 
-    				// ####### set the fill color of layer based on its normalized data value
-    				// layer.setStyle({
-    				// 	  color: getColor(props[attributeValue])
-    				// });
+            // ####### FILTER LAYER BASED ON UI LISTENING EVENT #######
+            // layer.setFilter(function(feature) {
+            //     if (feature.properties.[attributeValue] == "Yes")
+            //       return true
+            // });
+
+    				// ####### SET COLOR OF LAYER BASED ON UI LISTENING EVENT #######
+    				layer.setStyle({
+    					  color: getColor([attributeValue])
+    				});
+
+
+              // ####### WHEN MOUSING OVER LAYER TRAILS
+              layer.on('mouseover', function() {
+
+                // ####### CHANGE STROKE COLOR & BRING TO FRONT #######
+                layer.setStyle({
+                  color: 'yellow'
+                }).bringToFront();
+              });
+
+              // ####### ON MOUSING OFF LAYER #######
+              layer.on('mouseout', function() {
+
+                // ####### RESET LAYER STYLE TO ORIGIANL COLOR #######
+                layer.setStyle({
+                  color: getColor([attributeValue])
+                });
+
+          }).addTo(map); // ####### ADD IT TO MAP #######
 
     				// assemble string sequence of info for tooltip (end line break with + operator)
     				var tooltipInfo = "<b>" + props["Primary_Na"] + "</b></br>" +
@@ -258,6 +263,24 @@
     				});
 
     			});
+    		}
+
+
+        function getColor(attributeValue) {
+    			// function accepts a single normalized data attribute value
+    			// and uses a series of conditional statements to determine which
+    			// which color value to return to return to the function caller
+
+    			if (attributeValue == "SUMMER_M") {
+    				return 'blue';
+    			} else if (attributeValue == "SUMMER_NM") {
+    				return 'orange';
+    			} else if (attributeValue == "WINTER_M") {
+    				return 'black';
+    			} else if (attributeValue == "WINTER_NM") {
+    				return 'green'
+    			}
+
     		}
 
 
