@@ -131,7 +131,8 @@
   	<div id='ui-controls'>
   		<label>Choose Recreatation Type:</label>
   		<select id="trails">
-  			<option value="SUMMER_M" selected>Summer Motorized</option>
+            <option value="ALL" selected>All</option>
+  			<option value="SUMMER_M">Summer Motorized</option>
   			<option value="SUMMER_NM">Summer Non-Motorized</option>
   			<option value="WINTER_M">Winter Motorized</option>
         <option value="WINTER_NM">Winter Non-Motorized</option>
@@ -168,20 +169,33 @@
             ext: 'png'
         }).addTo(map);
 
-        // ####### AJAX CALL TO LOAD TRAILS DATA #######
-        $.getJSON("data/trails.geojson", function(data) {
 
-          drawMap(data); // ####### CALL drawMap FUCTION #######
+        var trailData = $.getJSON("data/trails.geojson"),
+            lakeData = $.getJSON("data/lakes.geojson"),
+            boundaryData = $.getJSON("data/park-boundary.geojson")
+        
+        $.when(trailData, lakeData, boundaryData).then(ready);
 
-        });
 
-        function drawMap(data) {
+        function ready(trailData, lakeData, boundaryData) {
+            L.geoJson(boundaryData).addTo(map)
+            drawMap(trailData, lakeData)
+            L.geoJson(lakeData).addTo(map)
+
+            //drawMap(data); // ####### CALL drawMap FUCTION #######
+
+        }
+
+        function drawMap(trailData, lakeData) {
 
           // ####### CREATE LEAFLET DATA LAYER #######
-          var dataLayer = L.geoJson(data, {
+          var summerLayer = L.geoJson(trailData, {
             filter: function(feature) {
-                if (feature.properties.SUMMER_M == "Yes") return true
-              },
+                if(feature.properties.SUMMER_M === "Yes" ||
+                    feature.properties.SUMMER_NM === "Yes") {
+                    return  feature;
+                }
+            },
             style: function(feature) {
               // ####### DEFAULT TRAILS LAYER STYLE #######
               return {
@@ -189,16 +203,39 @@
                 weight: 2
               };
             },
-          }).addTo(map); // ####### ADD IT TO MAP #######
+          }).addTo(map)
+
+         // remove layer from map (this will be moved into updateMap function)
+         map.removeLayer(summerLayer)
+
+
+        // ####### CREATE LEAFLET DATA LAYER #######
+        var winterLayer = L.geoJson(trailData, {
+            filter: function(feature) {
+                if(feature.properties.WINTER_M === "Yes") {
+                    return  feature;
+                }
+            },
+            style: function(feature) {
+              // ####### DEFAULT TRAILS LAYER STYLE #######
+              return {
+                color: 'yellow',
+                weight: 2
+              };
+            },
+          })  // not adding it to the map
+          
+          // add winter layer
+          map.addLayer(winterLayer)
 
           // ####### FIT MAP BOUNDS TO EXTENT OF TRAILS LAYER #######
-          map.fitBounds(dataLayer.getBounds(), {
+          map.fitBounds(summerLayer.getBounds(), {
             // #######  ????????? IS THIS NEEDED ????????? #######
             paddingTopLeft: [25, 25] // push off top left for sake of legend
           });
 
-          addUi(dataLayer); // ####### CALL addUI function #######
-          updateMap(dataLayer); // ####### CALL updateMap function #######
+          addUi(summerLayer); // ####### CALL addUI function #######
+          // updateMap(summerLayer); // ####### CALL updateMap function #######
 
         }
 
@@ -212,11 +249,6 @@
 
     				var props = layer.feature.properties;
 
-            // ####### FILTER LAYER BASED ON UI LISTENING EVENT #######
-            // layer.setFilter(function(feature) {
-            //     if (feature.properties.[attributeValue] == "Yes")
-            //       return true
-            // });
 
     				// ####### SET COLOR OF LAYER BASED ON UI LISTENING EVENT #######
     				layer.setStyle({
