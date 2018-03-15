@@ -129,12 +129,11 @@
 
     <!-- ui-controls div is selected by the JS and dynamically added to the map -->
   	<div id='ui-controls'>
-  		<label>Choose Recreation Type:</br></label>
+  		<label>Choose Recreatation Type:</label>
   		<select id="trails">
-            <!-- <option value="ALL" selected>All</option> -->
-  			<option value="SUMMER_M">Summer Moterized</option>
+  			<option value="SUMMER_M" selected>Summer Motorized</option>
   			<option value="SUMMER_NM">Summer Non-Motorized</option>
-  			<option value="WINTER_M">Winter Moterized</option>
+  			<option value="WINTER_M">Winter Motorized</option>
         <option value="WINTER_NM">Winter Non-Motorized</option>
   		</select>
   	</div> <!-- end ui-controls -->
@@ -169,164 +168,55 @@
             ext: 'png'
         }).addTo(map);
 
-        // ####### CREATE VARIABLES FROM GEOJSON DATA #######
-        var trailData = $.getJSON("data/trails.geojson"),
-            lakeData = $.getJSON("data/lakes.geojson"),
-            boundaryData = $.getJSON("data/park-boundary.geojson"),
-            countyRoadsData = $.getJSON("data/county-roads.geojson"),
-            co14Data = $.getJSON("data/CO-14.geojson")
+        // ####### AJAX CALL TO LOAD TRAILS DATA #######
+        $.getJSON("data/trails.geojson", function(data) {
 
-        // ####### MAKE GEOJSON DATA AVAILABLE TO READY FUNCTION #######
-        $.when(trailData, lakeData, boundaryData, countyRoadsData, co14Data).then(ready);
+          drawMap(data); // ####### CALL drawMap FUCTION #######
 
-        function ready(trailData, lakeData, boundaryData, countyRoadsData, co14Data) {
-            L.geoJson(boundaryData)
-            L.geoJson(lakeData)
-            L.geoJson(countyRoadsData)
-            L.geoJson(co14Data)
+        });
 
-            // ####### CALL drawMap FUCTION #######
-            drawMap(trailData, lakeData, boundaryData, countyRoadsData, co14Data)
+        function drawMap(data) {
 
-        }
-
-
-        function drawMap(trailData, lakeData, boundaryData, countyRoadsData, co14Data) {
-
-          // ####### CREATE LAKES LEAFLET DATA LAYER #######
-          var lakes = L.geoJson(lakeData, {
-            style: function(feature) {
-              return {
-                color: '#99ccff',
-                fillColor: '#99ccff',
-                weight: 1,
-                opacity: 0.7,
-                fillOpacity: 0.7
-              };
-            },
-          }).addTo(map)
-
-          // ####### CREATE PARK BOUNDARY LEAFLET DATA LAYER #######
-          var parkBoundary = L.geoJson(boundaryData, {
-            style: function(feature) {
-              return {
-                color: 'green',
-                weight: 5,
-                opacity: 0.7,
-                fillOpacity: 0
-              };
-            },
-          }).addTo(map)
-
-          // ####### CREATE HWY-14 LEAFLET DATA LAYER #######
-          var co14 = L.geoJson(co14Data, {
-            style: function(feature) {
-              return {
-                color: 'black',
-                weight: 3,
-                opacity: 0.7
-              };
-            },
-          }).addTo(map)
-
-          // ####### CREATE SUMMER MOTORIZED TRAILS LEAFLET DATA LAYER #######
-          var summerM = L.geoJson(trailData, {
+          // ####### CREATE LEAFLET DATA LAYER #######
+          var dataLayer = L.geoJson(data, {
             filter: function(feature) {
-                if(feature.properties.SUMMER_M === "Yes") {
-                     return  feature;
-                }
-            },
+                if (feature.properties.SUMMER_M == "Yes") return true
+              },
             style: function(feature) {
-              return {
-                color: 'orange',
-                weight: 2
-              };
-            },
-          }).addTo(map)
-
-          // ####### CREATE SUMMER NON-MOTORIZED TRAILS LEAFLET DATA LAYER #######
-          var summerNM = L.geoJson(trailData, {
-            filter: function(feature) {
-                if(feature.properties.SUMMER_NM === "Yes") {
-                     return  feature;
-                }
-            },
-            style: function(feature) {
+              // ####### DEFAULT TRAILS LAYER STYLE #######
               return {
                 color: 'blue',
                 weight: 2
               };
             },
-          }) // not added to the map
-
-        // ####### CREATE WINTER MOTORIZED TRAILS LEAFLET DATA LAYER #######
-        var winterM = L.geoJson(trailData, {
-            filter: function(feature) {
-                if(feature.properties.WINTER_M === "Yes") {
-                    return  feature;
-                }
-            },
-            style: function(feature) {
-              return {
-                color: 'red',
-                weight: 2
-              };
-            },
-          })  // not adding it to the map
-
-          // ####### CREATE WINTER NON-MOTORIZED TRAILS LEAFLET DATA LAYER #######
-          var winterNM = L.geoJson(trailData, {
-              filter: function(feature) {
-                  if(feature.properties.WINTER_NM === "Yes") {
-                      return  feature;
-                  }
-              },
-              style: function(feature) {
-                return {
-                  color: 'green',
-                  weight: 2
-                };
-              },
-            })  // not adding it to the map
-
-          // ####### CREATE COUNTY ROADS LEAFLET DATA LAYER #######
-          var countyRoads = L.geoJson(countyRoadsData, {
-            style: function(feature) {
-              return {
-                color: 'black',
-                weight: 2,
-                opacity: 0.7
-              };
-            },
-          }).addTo(map)
+          }).addTo(map); // ####### ADD IT TO MAP #######
 
           // ####### FIT MAP BOUNDS TO EXTENT OF TRAILS LAYER #######
-          map.fitBounds(parkBoundary.getBounds(), {
+          map.fitBounds(dataLayer.getBounds(), {
             // #######  ????????? IS THIS NEEDED ????????? #######
             paddingTopLeft: [25, 25] // push off top left for sake of legend
           });
 
-          addUi(summerM, summerNM, winterM, summerNM);
-          updateMap(summerM, summerNM, winterM, summerNM);
+          addUi(dataLayer); // ####### CALL addUI function #######
+          updateMap(dataLayer); // ####### CALL updateMap function #######
 
         }
 
         // ####### UPDATE MAP W/ CURRENT DATA ATTRIBUTE #######
-        function updateMap (summerM, summerNM, winterM, winterNM) {
+        function updateMap (dataLayer) {
 
     			// addLegend(breaks); // add the legend to the map using breaks
 
-          // remove layer from map (this will be moved into updateMap function)
-          // map.removeLayer(summerLayer)
-
-          // add winter layer
-          //map.addLayer(winterLayer)
-
     			// ####### LOOP THROUGH LAYER TO UPDATE FILTER, COLOR & TOOLTIP #######
-    			summerM.eachLayer(function(layer) {
+    			dataLayer.eachLayer(function(layer) {
 
     				var props = layer.feature.properties;
 
+            // ####### FILTER LAYER BASED ON UI LISTENING EVENT #######
+            // layer.setFilter(function(feature) {
+            //     if (feature.properties.[attributeValue] == "Yes")
+            //       return true
+            // });
 
     				// ####### SET COLOR OF LAYER BASED ON UI LISTENING EVENT #######
     				layer.setStyle({
