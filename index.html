@@ -149,9 +149,16 @@
         // ####### MAP OPTIONS #######
         var options = {
             center: [40.535507,-105.956697],
-            zoom: 12,
+            zoom: 10,
+            maxZoom: 16,
+            minZoom: 10,
             zoomSnap: 0.1,
-            zoomControl: false
+            zoomControl: false,
+            maxBounds: [
+                [40.46, -106.58],
+                [40.92, -105.53]
+
+            ]
         }
 
         // ####### CREATE THE LEAFLET MAP #######
