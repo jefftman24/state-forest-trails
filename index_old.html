@@ -208,6 +208,7 @@
     			// addLegend(breaks); // add the legend to the map using breaks
 
     			// ####### LOOP THROUGH LAYER TO UPDATE FILTER, COLOR & TOOLTIP #######
+
     			dataLayer.eachLayer(function(layer) {
 
     				var props = layer.feature.properties;
@@ -276,7 +277,7 @@
     		}
 
 
-        function addUi(dataLayer) {
+        function addUi() {
 
     		  	// ####### CREATE THE UI CONTROL #######
     		  	var selectControl = L.control({ position: 'topright'} );
@@ -293,7 +294,7 @@
       					// ####### CODE EXCUTED HERE WHEN CHANGE EVENT OCCURS #######
       					attributeValue = this.value;
     						// ####### CALL updateMap function #######
-    						updateMap(dataLayer);
+    						updateMap();
     				});
 
     		}

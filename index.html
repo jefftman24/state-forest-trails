@@ -148,8 +148,8 @@
 
         // ####### MAP OPTIONS #######
         var options = {
-            center: [40.649975,-105.938933],
-            zoom: 8,
+            center: [40.535507,-105.956697],
+            zoom: 12,
             zoomSnap: 0.1,
             zoomControl: false
         }
@@ -197,7 +197,7 @@
           var lakes = L.geoJson(lakeData, {
             style: function(feature) {
               return {
-                color: '#99ccff',
+                color: '#0000ff',
                 fillColor: '#99ccff',
                 weight: 1,
                 opacity: 0.7,
@@ -301,13 +301,13 @@
           }).addTo(map)
 
           // ####### FIT MAP BOUNDS TO EXTENT OF TRAILS LAYER #######
-          map.fitBounds(parkBoundary.getBounds(), {
-            // #######  ????????? IS THIS NEEDED ????????? #######
-            paddingTopLeft: [25, 25] // push off top left for sake of legend
-          });
+          // map.fitBounds(parkBoundary.getBounds(), {
+          //   // #######  ????????? IS THIS NEEDED ????????? #######
+          //   paddingTopLeft: [25, 25] // push off top left for sake of legend
+          // });
 
           addUi(summerM, summerNM, winterM, summerNM);
-          updateMap(summerM, summerNM, winterM, summerNM);
+          //updateMap(summerM, summerNM, winterM, summerNM);
 
         }
 
@@ -317,16 +317,35 @@
     			// addLegend(breaks); // add the legend to the map using breaks
 
           // remove layer from map (this will be moved into updateMap function)
-          // map.removeLayer(summerLayer)
+          map.removeLayer(summerM)
+          map.removeLayer(summerNM)
+          map.removeLayer(winterM)
+          map.removeLayer(winterNM)
 
-          // add winter layer
-          //map.addLayer(winterLayer)
+          if (attributeValue == "SUMMER_M") {
+              map.addLayer(summerM);
+          } else if (attributeValue == "SUMMER_NM") {
+              map.addLayer(summerNM);
+          } else if (attributeValue == "WINTER_M") {
+              map.addLayer(winterM);
+          } else if (attributeValue == "WINTER_NM") {
+              map.addLayer(winterNM);
+          }
+
+          if (attributeValue == "SUMMER_M") {
+              dataLayer = summerM;
+          } else if (attributeValue == "SUMMER_NM") {
+              dataLayer = summerNM;
+          } else if (attributeValue == "WINTER_M") {
+              dataLayer = winterM;
+          } else if (attributeValue == "WINTER_NM") {
+              dataLayer = winterNM;
+          }
 
     			// ####### LOOP THROUGH LAYER TO UPDATE FILTER, COLOR & TOOLTIP #######
-    			summerM.eachLayer(function(layer) {
+    			dataLayer.eachLayer(function(layer) {
 
     				var props = layer.feature.properties;
-
 
     				// ####### SET COLOR OF LAYER BASED ON UI LISTENING EVENT #######
     				layer.setStyle({
@@ -374,19 +393,19 @@
         function getColor(attributeValue) {
 
     			if (attributeValue == "SUMMER_M") {
-    				return 'blue';
-    			} else if (attributeValue == "SUMMER_NM") {
     				return 'orange';
+    			} else if (attributeValue == "SUMMER_NM") {
+    				return 'blue';
     			} else if (attributeValue == "WINTER_M") {
-    				return 'black';
+    				return 'red';
     			} else if (attributeValue == "WINTER_NM") {
-    				return 'green'
+    				return 'green';
     			}
 
     		}
 
 
-        function addUi(dataLayer) {
+        function addUi(summerM, summerNM, winterM, summerNM) {
 
     		  	// ####### CREATE THE UI CONTROL #######
     		  	var selectControl = L.control({ position: 'topright'} );
@@ -403,7 +422,7 @@
       					// ####### CODE EXCUTED HERE WHEN CHANGE EVENT OCCURS #######
       					attributeValue = this.value;
     						// ####### CALL updateMap function #######
-    						updateMap(dataLayer);
+    						updateMap(summerM, summerNM, winterM, summerNM);
     				});
 
     		}
