@@ -300,38 +300,15 @@
             },
           }).addTo(map)
 
-          // ####### FIT MAP BOUNDS TO EXTENT OF TRAILS LAYER #######
-          // map.fitBounds(parkBoundary.getBounds(), {
-          //   // #######  ????????? IS THIS NEEDED ????????? #######
-          //   paddingTopLeft: [25, 25] // push off top left for sake of legend
-          // });
-
+          highlightTooltip(summerM, summerNM, winterM, summerNM);
           addUi(summerM, summerNM, winterM, summerNM);
-          //updateMap(summerM, summerNM, winterM, summerNM);
 
         }
 
-        // ####### UPDATE MAP W/ CURRENT DATA ATTRIBUTE #######
-        function updateMap (summerM, summerNM, winterM, winterNM) {
 
-    			// addLegend(breaks); // add the legend to the map using breaks
+        function highlightTooltip (summerM, summerNM, winterM, winterNM) {
 
-          // remove layer from map (this will be moved into updateMap function)
-          map.removeLayer(summerM)
-          map.removeLayer(summerNM)
-          map.removeLayer(winterM)
-          map.removeLayer(winterNM)
-
-          if (attributeValue == "SUMMER_M") {
-              map.addLayer(summerM);
-          } else if (attributeValue == "SUMMER_NM") {
-              map.addLayer(summerNM);
-          } else if (attributeValue == "WINTER_M") {
-              map.addLayer(winterM);
-          } else if (attributeValue == "WINTER_NM") {
-              map.addLayer(winterNM);
-          }
-
+          // ####### UPDATE dataLayer VARIABLE BASED ON UI SELECTION #######
           if (attributeValue == "SUMMER_M") {
               dataLayer = summerM;
           } else if (attributeValue == "SUMMER_NM") {
@@ -342,33 +319,32 @@
               dataLayer = winterNM;
           }
 
-    			// ####### LOOP THROUGH LAYER TO UPDATE FILTER, COLOR & TOOLTIP #######
+    			// ####### LOOP THROUGH dataLayer #######
     			dataLayer.eachLayer(function(layer) {
 
-    				var props = layer.feature.properties;
+      				var props = layer.feature.properties;
 
-    				// ####### SET COLOR OF LAYER BASED ON UI LISTENING EVENT #######
-    				layer.setStyle({
-    					  color: getColor([attributeValue])
-    				});
+      				// ####### SET CORRECT COLOR OF ACTIVE dataLayer #######
+      				layer.setStyle({
+      					  color: getColor([attributeValue])
+      				});
 
-
-              // ####### WHEN MOUSING OVER LAYER TRAILS
+              // ####### WHEN MOUSING OVER #######
               layer.on('mouseover', function() {
 
-                // ####### CHANGE STROKE COLOR & BRING TO FRONT #######
-                layer.setStyle({
-                  color: 'yellow'
-                }).bringToFront();
+                    // ####### CHANGE STROKE COLOR & BRING TO FRONT #######
+                    layer.setStyle({
+                      color: 'yellow'
+                    }).bringToFront();
               });
 
               // ####### ON MOUSING OFF LAYER #######
               layer.on('mouseout', function() {
 
-                // ####### RESET LAYER STYLE TO ORIGIANL COLOR #######
-                layer.setStyle({
-                  color: getColor([attributeValue])
-                });
+                    // ####### RESET LAYER STYLE TO ORIGIANL COLOR #######
+                    layer.setStyle({
+                      color: getColor([attributeValue])
+                    });
 
           }).addTo(map); // ####### ADD IT TO MAP #######
 
@@ -386,21 +362,48 @@
     				});
 
     			});
+
+        }
+
+
+        function updateMap (summerM, summerNM, winterM, winterNM) {
+
+      			// addLegend(breaks); // add the legend to the map using breaks
+
+            // ####### REMOVE LAYER AFTER UI SELECTION #######
+            map.removeLayer(summerM)
+            map.removeLayer(summerNM)
+            map.removeLayer(winterM)
+            map.removeLayer(winterNM)
+
+            // ####### ADD LAYER BASED ON UI SELECTION #######
+            if (attributeValue == "SUMMER_M") {
+                map.addLayer(summerM);
+            } else if (attributeValue == "SUMMER_NM") {
+                map.addLayer(summerNM);
+            } else if (attributeValue == "WINTER_M") {
+                map.addLayer(winterM);
+            } else if (attributeValue == "WINTER_NM") {
+                map.addLayer(winterNM);
+            }
+
+            highlightTooltip(summerM, summerNM, winterM, summerNM);
+
     		}
 
 
         // ####### SELECTS COLOR OF TRAILS BASED ON 'attributeValue' VARIBALE #######
         function getColor(attributeValue) {
 
-    			if (attributeValue == "SUMMER_M") {
-    				return 'orange';
-    			} else if (attributeValue == "SUMMER_NM") {
-    				return 'blue';
-    			} else if (attributeValue == "WINTER_M") {
-    				return 'red';
-    			} else if (attributeValue == "WINTER_NM") {
-    				return 'green';
-    			}
+      			if (attributeValue == "SUMMER_M") {
+      				return 'orange';
+      			} else if (attributeValue == "SUMMER_NM") {
+      				return 'blue';
+      			} else if (attributeValue == "WINTER_M") {
+      				return 'red';
+      			} else if (attributeValue == "WINTER_NM") {
+      				return 'green';
+      			}
 
     		}
 
