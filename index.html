@@ -168,6 +168,9 @@
         // ####### SET GLOBAL VARIABLE FOR TRAIL LAYER #######
         var attributeValue = "SUMMER_M"
 
+        // ####### SET GLOBAL VARIABLE FOR GRAY SCALE TOOLTIP #######
+        var grayVariable = "Non-Motorized Trail"
+
         // ####### REQUEST TILES & ADD TO MAP #######
         var tiles = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.{ext}', {
              attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
@@ -349,7 +352,7 @@
             },
             style: function(feature) {
               return {
-                color: 'red',
+                color: 'orange',
                 weight: 2
               };
             },
@@ -364,7 +367,7 @@
               },
               style: function(feature) {
                 return {
-                  color: 'green',
+                  color: 'blue',
                   weight: 2
                 };
               },
@@ -381,24 +384,53 @@
             },
           })//.addTo(map)
 
-          highlightTooltip(summerM, summerNM, winterM, summerNM);
+          highlightTooltip(summerM, summerNM, winterM, winterNM, graySummerM, graySummerNM, grayWinterM, grayWinterNM);
           addUi(summerM, summerNM, winterM, winterNM, graySummerM, graySummerNM, grayWinterM, grayWinterNM);
 
         }
 
 
-        function highlightTooltip (summerM, summerNM, winterM, winterNM) {
+        function highlightTooltip(summerM, summerNM, winterM, winterNM, graySummerM, graySummerNM, grayWinterM, grayWinterNM) {
 
-          // ####### UPDATE dataLayer VARIABLE BASED ON UI SELECTION #######
+          // ####### UPDATE dataLayer & grayLayer VARIABLES BASED ON UI SELECTION #######
           if (attributeValue == "SUMMER_M") {
-              dataLayer = summerM;
+              dataLayer = summerM,
+              grayLayer = graySummerNM;
           } else if (attributeValue == "SUMMER_NM") {
-              dataLayer = summerNM;
+              dataLayer = summerNM,
+              grayLayer = graySummerM;
           } else if (attributeValue == "WINTER_M") {
-              dataLayer = winterM;
+              dataLayer = winterM,
+              grayLayer = grayWinterNM;
           } else if (attributeValue == "WINTER_NM") {
-              dataLayer = winterNM;
+              dataLayer = winterNM,
+              grayLayer = grayWinterM;
           }
+
+          grayLayer.eachLayer(function(gray) {
+
+            // ####### UPDATE grayLayer VARIABLE BASED ON UI SELECTION #######
+            if (attributeValue == "SUMMER_M") {
+                grayVariable = "Non-Motorized Trail";
+            } else if (attributeValue == "SUMMER_NM") {
+                grayVariable = "Motorized Trail";
+            } else if (attributeValue == "WINTER_M") {
+                grayVariable = "Non-Motorized Trail";
+            } else if (attributeValue == "WINTER_NM") {
+                grayVariable = "Motorized Trail";
+            }
+
+            // ####### SET grayTooltipInfo VARIABLE TO grayVariable FROM ABOVE #######
+            var grayTooltipInfo = grayVariable;
+
+            // ####### BIND TOOLTIP TO LAYER #######
+            grayLayer.bindTooltip(grayTooltipInfo, {
+                // ####### STICKY PROPERTY SO TOOLTIP FOLLOWS THE MOUSE #######
+                sticky: true,
+                tooltipAnchor: [200, 200]
+            });
+
+          })
 
     			// ####### LOOP THROUGH dataLayer #######
     			dataLayer.eachLayer(function(layer) {
@@ -476,7 +508,7 @@
                 map.addLayer(grayWinterM);
             }
 
-            highlightTooltip(summerM, summerNM, winterM, summerNM);
+            highlightTooltip(summerM, summerNM, winterM, winterNM, graySummerM, graySummerNM, grayWinterM, grayWinterNM);
 
     		}
 
@@ -489,9 +521,9 @@
       			} else if (attributeValue == "SUMMER_NM") {
       				return 'blue';
       			} else if (attributeValue == "WINTER_M") {
-      				return 'red';
+      				return 'orange';
       			} else if (attributeValue == "WINTER_NM") {
-      				return 'green';
+      				return 'blue';
       			}
 
     		}
