@@ -128,14 +128,22 @@
 
   <!-- ui-controls div is selected by the JS and dynamically added to the map -->
   <div id='ui-controls'>
-    <label>Choose Recreation Type:</br></label>
+    <!-- <label>Choose Recreation Type:</br></label>
     <select id="trails">
-            <!-- <option value="ALL" selected>All</option> -->
   			<option value="SUMMER_M">Summer Moterized</option>
   			<option value="SUMMER_NM">Summer Non-Motorized</option>
   			<option value="WINTER_M">Winter Moterized</option>
         <option value="WINTER_NM">Winter Non-Motorized</option>
-  		</select>
+  		</select> -->
+
+      <form>
+        <label>Choose Recreation Type:</br></label>
+         <input type="radio" name="trails" value="SUMMER_M" checked> Summer Motorized<br>
+         <input type="radio" name="trails" value="SUMMER_NM"> Summer Non-Motorized<br>
+         <input type="radio" name="trails" value="WINTER_M"> Winter Motorized<br>
+         <input type="radio" name="trails" value="WINTER_NM"> Winter Non-Motorized
+      </form>
+
   </div>
   <!-- end ui-controls -->
 
@@ -388,72 +396,49 @@
         },
       }).addTo(map)
 
-      // ####### SVG PATHES VARIABLE ARRAY #######
-      var svgPath = [
-          "svgs/building.svg",
-          "svgs/campground.svg",
-          "svgs/trailhead.svg",
-          "svgs/parking.svg",
-          "svgs/overlook.svg"
-          ];
-
       // ####### RECREATATION SYMBOLS LEAFLET DATA LAYER #######
       var recSymbols = L.geoJson(recSymbolData, {
-          style: function(feature) {
-              return {
-                color: 'blue'
-              };
+          pointToLayer: function(feature, latlng) {
+            return L.marker(latlng, {
+              icon: getSVG(feature.properties.Type)
+            })
+          },
+          onEachFeature: function(feature, layer) {
+            var popup = "<b>" + feature.properties.Name + "<b>"
+            layer.bindTooltip(popup)
           }
       }).addTo(map)
 
-      for (var i = 0; i < recSymbols.length; i++) {
-        var popupName = recSymbols[i].properties.Name
-        //var type = recSymbols[i].properties.Type
-
-        var popup = "<b>" + popupName + "</b>";
-
-        // ####### BUILD LEAFLET SVG ICON #######
-        var marker = getSVG(recSymbols[i].properties.Type);
-
-        L.marker(recSymbols[i].properties.coordinates, {
-            icon: marker
-          })
-          .addTo(map)
-          .bindPopup(popup);
-      };
 
       highlightTooltip(summerM, summerNM, winterM, winterNM, graySummerM, graySummerNM, grayWinterM, grayWinterNM);
       addUi(summerM, summerNM, winterM, winterNM, graySummerM, graySummerNM, grayWinterM, grayWinterNM);
 
     }
 
-    function getSVG(type) {
 
-      var type = recSymbols.properties.Type
+    function getSVG(type) {
 
       // ####### CREATE EMPTY SVG ARRAY #######
       var svg = ""
 
           if (type == "Building") {
-            svg = svgPath[0];
+            svg =  "svgs/building.png";
           } else if (type == "Campground") {
-            svg = svgPath[1];
+            svg =  "svgs/campground.png";
           } else if (type == "Trailhead") {
-            svg = svgPath[2];
+            svg = "svgs/trailhead.png";
           } else if (type == "Parking") {
-            svg = svgPath[3];
+            svg = "svgs/parking.png";
           } else if (type == "Overlook") {
-            svg = svgPath[4];
+            svg = "svgs/overlook.png";
           };
 
-        // CREATE LEAFLET ICON OBJECT
-        var result = L.icon({
+        return L.icon({
           iconUrl: svg,
           iconSize: 30,
           popupAnchor: [0, -15],
           className: 'icon'
-        }).addTo(map);
-        return result;
+         })
 
     }
 
@@ -632,7 +617,7 @@
       // ####### ADD UI CONTROL TO THE MAP #######
       selectControl.addTo(map);
 
-      $('select[id="trails"]').change(function() {
+      $('input[type="radio"]').change(function() {
         // ####### CODE EXCUTED HERE WHEN CHANGE EVENT OCCURS #######
         attributeValue = this.value;
         // ####### CALL updateMap function #######
