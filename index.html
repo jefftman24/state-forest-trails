@@ -187,25 +187,28 @@
       boundaryData = $.getJSON("data/park-boundary.geojson"),
       countyRoadsData = $.getJSON("data/county-roads.geojson"),
       co14Data = $.getJSON("data/CO-14.geojson"),
-      parkRoadData = $.getJSON("data/park-roads.geojson")
+      parkRoadData = $.getJSON("data/park-roads.geojson"),
+      recSymbolData = $.getJSON("data/rec-symbols.geojson")
+
 
     // ####### MAKE GEOJSON DATA AVAILABLE TO READY FUNCTION #######
-    $.when(trailData, lakeData, boundaryData, countyRoadsData, co14Data, parkRoadData).then(ready);
+    $.when(trailData, lakeData, boundaryData, countyRoadsData, co14Data, parkRoadData, recSymbolData).then(ready);
 
-    function ready(trailData, lakeData, boundaryData, countyRoadsData, co14Data, parkRoadData) {
+    function ready(trailData, lakeData, boundaryData, countyRoadsData, co14Data, parkRoadData, recSymbolData) {
       L.geoJson(boundaryData)
       L.geoJson(lakeData)
       L.geoJson(countyRoadsData)
       L.geoJson(co14Data)
       L.geoJson(parkRoadData)
+      L.geoJson(recSymbolData)
 
       // ####### CALL drawMap FUCTION #######
-      drawMap(trailData, lakeData, boundaryData, countyRoadsData, co14Data, parkRoadData)
+      drawMap(trailData, lakeData, boundaryData, countyRoadsData, co14Data, parkRoadData,recSymbolData)
 
     }
 
 
-    function drawMap(trailData, lakeData, boundaryData, countyRoadsData, co14Data, parkRoadData) {
+    function drawMap(trailData, lakeData, boundaryData, countyRoadsData, co14Data, parkRoadData, recSymbolData) {
 
       // ####### CREATE LAKES LEAFLET DATA LAYER #######
       var lakes = L.geoJson(lakeData, {
@@ -228,17 +231,6 @@
             weight: 5,
             opacity: 0.7,
             fillOpacity: 0
-          };
-        },
-      }).addTo(map)
-
-      // ####### CREATE PARK ROADS LEAFLET DATA LAYER #######
-      var parkRoads = L.geoJson(parkRoadData, {
-        style: function(feature) {
-          return {
-            color: 'white',
-            weight: 2,
-            opacity: 0.7
           };
         },
       }).addTo(map)
@@ -385,8 +377,83 @@
         },
       }) //.addTo(map)
 
+      // ####### CREATE PARK ROADS LEAFLET DATA LAYER #######
+      var parkRoads = L.geoJson(parkRoadData, {
+        style: function(feature) {
+          return {
+            color: 'white',
+            weight: 2,
+            opacity: 0.7
+          };
+        },
+      }).addTo(map)
+
+      // ####### SVG PATHES VARIABLE ARRAY #######
+      var svgPath = [
+          "svgs/building.svg",
+          "svgs/campground.svg",
+          "svgs/trailhead.svg",
+          "svgs/parking.svg",
+          "svgs/overlook.svg"
+          ];
+
+      // ####### RECREATATION SYMBOLS LEAFLET DATA LAYER #######
+      var recSymbols = L.geoJson(recSymbolData, {
+          style: function(feature) {
+              return {
+                color: 'blue'
+              };
+          }
+      }).addTo(map)
+
+      for (var i = 0; i < recSymbols.length; i++) {
+        var popupName = recSymbols[i].properties.Name
+        //var type = recSymbols[i].properties.Type
+
+        var popup = "<b>" + popupName + "</b>";
+
+        // ####### BUILD LEAFLET SVG ICON #######
+        var marker = getSVG(recSymbols[i].properties.Type);
+
+        L.marker(recSymbols[i].properties.coordinates, {
+            icon: marker
+          })
+          .addTo(map)
+          .bindPopup(popup);
+      };
+
       highlightTooltip(summerM, summerNM, winterM, winterNM, graySummerM, graySummerNM, grayWinterM, grayWinterNM);
       addUi(summerM, summerNM, winterM, winterNM, graySummerM, graySummerNM, grayWinterM, grayWinterNM);
+
+    }
+
+    function getSVG(type) {
+
+      var type = recSymbols.properties.Type
+
+      // ####### CREATE EMPTY SVG ARRAY #######
+      var svg = ""
+
+          if (type == "Building") {
+            svg = svgPath[0];
+          } else if (type == "Campground") {
+            svg = svgPath[1];
+          } else if (type == "Trailhead") {
+            svg = svgPath[2];
+          } else if (type == "Parking") {
+            svg = svgPath[3];
+          } else if (type == "Overlook") {
+            svg = svgPath[4];
+          };
+
+        // CREATE LEAFLET ICON OBJECT
+        var result = L.icon({
+          iconUrl: svg,
+          iconSize: 30,
+          popupAnchor: [0, -15],
+          className: 'icon'
+        }).addTo(map);
+        return result;
 
     }
 
@@ -415,7 +482,7 @@
 
           // ####### CHANGE STROKE COLOR & BRING TO FRONT #######
           grayLayer.setStyle({
-            color: 'black'
+            color: '#4d4d4d'
           }).bringToFront();
         });
 
