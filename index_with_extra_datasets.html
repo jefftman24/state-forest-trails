@@ -44,47 +44,6 @@
       bottom: 0;
     }
 
-    .legend {
-      padding: 6px 8px;
-      font-size: 1em;
-      font-weight: bold;
-      background: rgba(245, 245, 245, 0.8);
-      color: rgb(0, 0, 0);
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-      border-radius: 5px;
-      width: 160px;
-    }
-
-    .legend h3 {
-      font-size: 1.1em;
-      font-weight: bold;
-      line-height: 1em;
-      color: rgb(0, 0, 0);
-      margin: 0;
-    }
-
-    .legend h3 span {
-      font-size: 1.3em;
-      margin: 0 20px 0 0;
-    }
-
-    .legend ul {
-      list-style-type: none;
-      padding: 0;
-      margin: 12px 4px 0;
-    }
-
-    .legend li {
-      height: 22px;
-    }
-
-    .legend span {
-      width: 30px;
-      height: 20px;
-      float: left;
-      margin-right: 10px;
-    }
-
     #ui-controls {
       width: 176px;
       padding: 8px 25px 8px 15px;
@@ -145,7 +104,7 @@
 
     // ####### MAP OPTIONS #######
     var options = {
-      center: [40.53, -105.95],
+      center: [40.5247, -105.95],
       zoom: 13,
       maxZoom: 14,
       minZoom: 10,
@@ -159,7 +118,6 @@
 
     // ####### CREATE THE LEAFLET MAP #######
     var map = L.map('map', options);
-
     // ####### ADD ZOOM CONTROL TO BOTTOM-RIGHT OF MAP #######
     map.addControl(L.control.zoom({
       position: 'bottomright'
@@ -182,26 +140,45 @@
 
     // ####### CREATE VARIABLES FROM GEOJSON DATA #######
     var trailData = $.getJSON("data/trails.geojson"),
+      lakeData = $.getJSON("data/lakes.geojson"),
       boundaryData = $.getJSON("data/park-boundary.geojson"),
+      countyRoadsData = $.getJSON("data/county-roads.geojson"),
+      co14Data = $.getJSON("data/CO-14.geojson"),
       parkRoadData = $.getJSON("data/park-roads.geojson"),
       recSymbolData = $.getJSON("data/rec-symbols.geojson")
 
 
     // ####### MAKE GEOJSON DATA AVAILABLE TO READY FUNCTION #######
-    $.when(trailData, boundaryData, parkRoadData, recSymbolData).then(ready);
+    $.when(trailData, lakeData, boundaryData, countyRoadsData, co14Data, parkRoadData, recSymbolData).then(ready);
 
-    function ready(trailData, boundaryData, parkRoadData, recSymbolData) {
+    function ready(trailData, lakeData, boundaryData, countyRoadsData, co14Data, parkRoadData, recSymbolData) {
       L.geoJson(boundaryData)
+      L.geoJson(lakeData)
+      L.geoJson(countyRoadsData)
+      L.geoJson(co14Data)
       L.geoJson(parkRoadData)
       L.geoJson(recSymbolData)
 
       // ####### CALL drawMap FUCTION #######
-      drawMap(trailData, boundaryData, parkRoadData,recSymbolData)
+      drawMap(trailData, lakeData, boundaryData, countyRoadsData, co14Data, parkRoadData,recSymbolData)
 
     }
 
 
-    function drawMap(trailData, boundaryData, parkRoadData, recSymbolData) {
+    function drawMap(trailData, lakeData, boundaryData, countyRoadsData, co14Data, parkRoadData, recSymbolData) {
+
+      // ####### CREATE LAKES LEAFLET DATA LAYER #######
+      var lakes = L.geoJson(lakeData, {
+        style: function(feature) {
+          return {
+            color: '#0000ff',
+            fillColor: '#99ccff',
+            weight: 1,
+            opacity: 0.7,
+            fillOpacity: 0.7
+          };
+        },
+      })
 
       // ####### CREATE PARK BOUNDARY LEAFLET DATA LAYER #######
       var parkBoundary = L.geoJson(boundaryData, {
@@ -214,6 +191,17 @@
           };
         },
       }).addTo(map)
+
+      // ####### CREATE HWY-14 LEAFLET DATA LAYER #######
+      var co14 = L.geoJson(co14Data, {
+        style: function(feature) {
+          return {
+            color: 'black',
+            weight: 3,
+            opacity: 0.7
+          };
+        },
+      })
 
       // ####### CREATE SUMMER MOTORIZED TRAILS LEAFLET DATA LAYER #######
       var summerM = L.geoJson(trailData, {
@@ -335,6 +323,17 @@
         },
       })
 
+      // ####### CREATE COUNTY ROADS LEAFLET DATA LAYER #######
+      var countyRoads = L.geoJson(countyRoadsData, {
+        style: function(feature) {
+          return {
+            color: 'black',
+            weight: 2,
+            opacity: 0.7
+          };
+        },
+      })
+
       // ####### CREATE PARK ROADS LEAFLET DATA LAYER #######
       var parkRoads = L.geoJson(parkRoadData, {
         style: function(feature) {
@@ -360,9 +359,7 @@
       }).addTo(map)
 
 
-      // ####### CALL highlightTooltip FUNCTION #######
       highlightTooltip(summerM, summerNM, winterM, winterNM, graySummerM, graySummerNM, grayWinterM, grayWinterNM);
-      // ####### CALL addUi FUNCTION #######
       addUi(summerM, summerNM, winterM, winterNM, graySummerM, graySummerNM, grayWinterM, grayWinterNM);
 
     }
@@ -370,10 +367,9 @@
 
     function getSVG(type) {
 
-      // ####### CREATE EMPTY ARRAY FOR SVG PATHES #######
+      // ####### CREATE EMPTY SVG ARRAY #######
       var svg = ""
 
-          // ####### ASSOCIATE SVG WITH REC SYMBOL LAYER TYPE ATTRIBUTE #######
           if (type == "Building") {
             svg =  "svgs/building.png";
           } else if (type == "Campground") {
@@ -390,7 +386,6 @@
             svg = "svgs/restroom.png";
           };
 
-        // ####### CREATE ICON FROM SVG W/ THESE OPTIONS #######
         return L.icon({
           iconUrl: svg,
           iconSize: 30,
@@ -418,7 +413,6 @@
           grayLayer = grayWinterM;
       }
 
-      // ####### ON EACH GRAY SCALE TRAIL LAYER #######
       grayLayer.eachLayer(function(layer) {
 
         // ####### WHEN MOUSING OVER #######
@@ -495,8 +489,9 @@
 
         // ####### HTML STRING FOR TOOLTIP DISPLAY #######
         var tooltipInfo = "<b>" + props["Primary_Na"] + "</b></br>" +
+          "Class: " + props["Trail_Clas"] + "</br>" +
           "Difficulty: " + props["Difficulty"] + "</br>" +
-          "Length: " + Number(props["Length_ft"]).toLocaleString() + " ft";
+          "Surface: " + props["Surface"];
 
         // ####### BIND TOOLTIP TO LAYER #######
         layer.bindTooltip(tooltipInfo, {
@@ -511,6 +506,8 @@
 
 
     function updateMap(summerM, summerNM, winterM, winterNM, graySummerM, graySummerNM, grayWinterM, grayWinterNM) {
+
+      // addLegend(breaks); // add the legend to the map using breaks
 
       // ####### REMOVE LAYER AFTER UI SELECTION #######
       map.removeLayer(summerM)
@@ -537,7 +534,6 @@
           map.addLayer(grayWinterM);
       }
 
-      // ####### CALL highlightTooltip FUNCTION #######
       highlightTooltip(summerM, summerNM, winterM, winterNM, graySummerM, graySummerNM, grayWinterM, grayWinterNM);
 
     }
@@ -577,7 +573,6 @@
       $('input[type="radio"]').change(function() {
         // ####### CODE EXCUTED HERE WHEN CHANGE EVENT OCCURS #######
         attributeValue = this.value;
-
         // ####### CALL updateMap function #######
         updateMap(summerM, summerNM, winterM, winterNM, graySummerM, graySummerNM, grayWinterM, grayWinterNM);
       });
