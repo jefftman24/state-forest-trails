@@ -25,16 +25,21 @@
       left: 15px;
       padding: 8px 15px;
       margin: 0;
-      color: rgb(0, 0, 0);
+      color: #004d00;
       font-size: 1.8em;
       background: rgba(245, 245, 245, 0.8);
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
       border-radius: 5px;
     }
 
-    h2 {
-      display: inline-block;
-      color: #001323;
+    popup {
+      color: #004d00;
+      font-weight: bold;
+    }
+
+    gstt {
+      color: #4d4d4d;
+      font-weight: bold;
     }
 
     #map {
@@ -42,47 +47,6 @@
       width: 100%;
       top: 0;
       bottom: 0;
-    }
-
-    .legend {
-      padding: 6px 8px;
-      font-size: 1em;
-      font-weight: bold;
-      background: rgba(245, 245, 245, 0.8);
-      color: rgb(0, 0, 0);
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-      border-radius: 5px;
-      width: 160px;
-    }
-
-    .legend h3 {
-      font-size: 1.1em;
-      font-weight: bold;
-      line-height: 1em;
-      color: rgb(0, 0, 0);
-      margin: 0;
-    }
-
-    .legend h3 span {
-      font-size: 1.3em;
-      margin: 0 20px 0 0;
-    }
-
-    .legend ul {
-      list-style-type: none;
-      padding: 0;
-      margin: 12px 4px 0;
-    }
-
-    .legend li {
-      height: 22px;
-    }
-
-    .legend span {
-      width: 30px;
-      height: 20px;
-      float: left;
-      margin-right: 10px;
     }
 
     #ui-controls {
@@ -94,29 +58,6 @@
       color: rgb(0, 0, 0);
     }
 
-    #ui-controls .min {
-      float: left;
-    }
-
-    #ui-controls .max {
-      float: right;
-      margin-right: -15px;
-    }
-
-    label {
-      font-size: 1.1em;
-      font-weight: bold;
-    }
-
-    footer {
-      padding: 6px 10%;
-      width: 80%;
-    }
-
-    p {
-      font-size: 1em;
-      color: #001323;
-    }
   </style>
 </head>
 
@@ -354,7 +295,7 @@
             })
           },
           onEachFeature: function(feature, layer) {
-            var popup = "<b>" + feature.properties.Name + "<b>"
+            var popup = "<popup>" + feature.properties.Name + "</popup>"
             layer.bindTooltip(popup)
           }
       }).addTo(map)
@@ -451,7 +392,7 @@
         }
 
         // ####### SET grayTooltipInfo VARIABLE TO grayVariable FROM ABOVE #######
-        var grayTooltipInfo = "<b>" + grayVariable + "</b>";
+        var grayTooltipInfo = "<gstt>" + grayVariable + "</gstt>";
 
         // ####### BIND TOOLTIP TO LAYER #######
         grayLayer.bindTooltip(grayTooltipInfo, {
