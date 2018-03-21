@@ -22,16 +22,24 @@
       position: absolute;
       z-index: 650;
       top: 10px;
-      left: 15px;
+      right: 15px;
       padding: 8px 15px;
       margin: 0;
       color: #004d00;
-      font-size: 1.8em;
+      font-size: 2.4em;
       background: rgba(245, 245, 245, 0.8);
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
       border-radius: 5px;
       /* text-transform: uppercase; */
     }
+
+
+    /* @media only screen and (max-width: 768px) { */
+        /* ####### FOR MOBILE DEVICES ONLY ####### */
+        /* [class*="h1"] {
+            font-size: 2.4em;                             ####### MESS W/ THIS LATER ########
+        }
+    } */
 
     popup {
       color: #004d00;
@@ -89,7 +97,7 @@
     // ####### MAP OPTIONS #######
     var options = {
       center: [40.53, -105.95],
-      zoom: 13,
+      zoom: 12.9,
       maxZoom: 14,
       minZoom: 10,
       zoomSnap: 0.1,
@@ -283,7 +291,7 @@
         style: function(feature) {
           return {
             color: 'white',
-            weight: 2,
+            weight: 3,
             opacity: 0.7
           };
         },
@@ -349,16 +357,16 @@
       // ####### UPDATE dataLayer & grayLayer VARIABLES BASED ON UI SELECTION #######
       if (attributeValue == "SUMMER_M") {
         dataLayer = summerM,
-          grayLayer = graySummerNM;
+        grayLayer = graySummerNM;
       } else if (attributeValue == "SUMMER_NM") {
         dataLayer = summerNM,
-          grayLayer = graySummerM;
+        grayLayer = graySummerM;
       } else if (attributeValue == "WINTER_M") {
         dataLayer = winterM,
-          grayLayer = grayWinterNM;
+        grayLayer = grayWinterNM;
       } else if (attributeValue == "WINTER_NM") {
         dataLayer = winterNM,
-          grayLayer = grayWinterM;
+        grayLayer = grayWinterM;
       }
 
       // ####### ON EACH GRAY SCALE TRAIL LAYER #######
@@ -441,7 +449,7 @@
         // ####### HTML STRING FOR TOOLTIP DISPLAY #######
         var tooltipInfo = "<b><u>" + props["Primary_Na"] + "</u></b></br>" +
           "Difficulty: " + props["Difficulty"] + "</br>" +
-          "Length: " + Number(props["Length_ft"]).toLocaleString() + " ft";
+          "Length: " + Number(props["Legnth_mi"]).toLocaleString() + " miles";
 
         // ####### BIND TOOLTIP TO LAYER #######
         layer.bindTooltip(tooltipInfo, {
@@ -470,16 +478,16 @@
       // ####### ADD LAYER BASED ON UI SELECTION #######
       if (attributeValue == "SUMMER_M") {
         map.addLayer(summerM),
-          map.addLayer(graySummerNM);
+        map.addLayer(graySummerNM);
       } else if (attributeValue == "SUMMER_NM") {
         map.addLayer(summerNM),
-          map.addLayer(graySummerM);
+        map.addLayer(graySummerM);
       } else if (attributeValue == "WINTER_M") {
         map.addLayer(winterM),
-          map.addLayer(grayWinterNM);
+        map.addLayer(grayWinterNM);
       } else if (attributeValue == "WINTER_NM") {
         map.addLayer(winterNM),
-          map.addLayer(grayWinterM);
+        map.addLayer(grayWinterM);
       }
 
       // ####### CALL highlightTooltip FUNCTION #######
@@ -508,7 +516,7 @@
 
       // ####### CREATE THE UI CONTROL #######
       var selectControl = L.control({
-        position: 'topright'
+        position: 'bottomleft'
       });
 
       // ####### WHEN CONTROL IS ADDED #######
@@ -520,7 +528,7 @@
       selectControl.addTo(map);
 
       $('input[type="radio"]').change(function() {
-        // ####### CODE EXCUTED HERE WHEN CHANGE EVENT OCCURS #######
+        // ####### attributeValue VARIBALE UPDATED WHEN CHANGE EVENT OCCURS #######
         attributeValue = this.value;
 
         // ####### CALL updateMap function #######
