@@ -272,7 +272,7 @@
       var recSymbols = L.geoJson(recSymbolData, {
           pointToLayer: function(feature, latlng) {
             return L.marker(latlng, {
-              icon: getSVG(feature.properties.Type)
+              icon: getSVG1(feature.properties.Type)
             })
           },
           onEachFeature: function(feature, layer) {
@@ -281,6 +281,34 @@
           }
       }).addTo(map)
 
+      // ####### RECREATATION SYMBOLS LEAFLET DATA LAYER #######
+      var recSymbolsSm = L.geoJson(recSymbolData, {
+          pointToLayer: function(feature, latlng) {
+            return L.marker(latlng, {
+              icon: getSVG2(feature.properties.Type)
+            })
+          },
+          onEachFeature: function(feature, layer) {
+            var popup = "<popup>" + feature.properties.Name + "</popup>"
+            layer.bindTooltip(popup)
+          }
+      })
+
+      map.on('zoomend', function() {
+          var currentZoom = map.getZoom();
+          // map.removeLayer(recSymbols),
+          // map.removeLayer(recSymbolsSm);
+          console.log(currentZoom);
+
+          if (currentZoom < 12) {
+              map.removeLayer(recSymbols),
+              map.addLayer(recSymbolsSm);
+            } else if (currentZoom > 12) {
+              map.removeLayer(recSymbolsSm),
+              map.addLayer(recSymbols);
+            }
+
+      });
 
       // ####### CALL highlightTooltip FUNCTIONS #######
       highlightTooltip1(summerM, summerNM, winterM, winterNM);
@@ -291,7 +319,7 @@
     }
 
 
-    function getSVG(type) {
+    function getSVG1(type) {
 
       // ####### CREATE EMPTY ARRAY FOR SVG PATHES #######
       var svg = ""
@@ -325,9 +353,41 @@
     }
 
 
-    function getIconSize(iconSize) {
+    function getSVG2(type) {
 
-      // map.on('zoomend', function() {
+      // ####### CREATE EMPTY ARRAY FOR SVG PATHES #######
+      var svg = ""
+
+          // ####### ASSOCIATE SVG WITH REC SYMBOL LAYER TYPE ATTRIBUTE #######
+          if (type == "Building") {
+            svg =  "svgs/building.png";
+          } else if (type == "Campground") {
+            svg =  "svgs/campground.png";
+          } else if (type == "Trailhead") {
+            svg = "svgs/trailhead.png";
+          } else if (type == "Parking") {
+            svg = "svgs/parking.png";
+          } else if (type == "Overlook") {
+            svg = "svgs/overlook.png";
+          } else if (type == "Ranger") {
+            svg = "svgs/ranger.png";
+          } else if (type == "Restroom") {
+            svg = "svgs/restroom.png";
+          };
+
+        // ####### CREATE ICON FROM SVG W/ THESE OPTIONS #######
+        return L.icon({
+          iconUrl: svg,
+          iconSize: 15,
+          // iconSize: getIconSize(iconSize),
+          popupAnchor: [0, -15],
+          className: 'icon'
+         })
+
+    }
+
+
+    function getIconSize(iconSize) {
 
         var currentZoom = map.getZoom();
         var iconSize = ""
@@ -337,8 +397,6 @@
         } else if (currentZoom < 12) {
           iconSize = '30';
         }
-
-      // }
 
     }
 
