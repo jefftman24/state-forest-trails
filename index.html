@@ -56,6 +56,7 @@
     popup {
       color: #004d00;
       font-weight: bold;
+      /* text-align: center; */
     }
 
     m {
@@ -73,11 +74,13 @@
     ml {
       color: #e65c00;
       font-weight: bold;
+      text-transform: uppercase;
     }
 
     nml {
       color: #0000ff;
       font-weight: bold;
+      text-transform: uppercase;
     }
 
     #map {
@@ -87,13 +90,64 @@
       bottom: 0;
     }
 
-    #ui-controls {
+    /* #ui-controls {
       width: 176px;
       padding: 8px 25px 8px 15px;
       background: rgba(245, 245, 245, 0.8);
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
       border-radius: 5px;
       font-weight: bold;
+      color: #333333;
+    } */
+
+    ui {
+      position: absolute;
+      z-index: 650;
+      bottom: 25px;
+      right: 15px;
+      padding: 8px 15px;
+      margin: 0;
+      font-size: 0.8em;
+      background: rgba(245, 245, 245, 0.8);
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+      border-radius: 5px;
+    }
+
+    input[type=radio]{
+      display:none;
+    }
+
+
+    input[type=radio] + label.btn{
+      padding: 5px 10px;
+      margin: 5px 10px;
+      display: inline-block;
+      text-transform: uppercase;
+      font-weight: 700;
+      outline: none;
+      position: relative;
+      -webkit-transition: all 0.3s;
+      -moz-transition: all 0.3s;
+      transition: all 0.3s;
+      background: rgba(245, 245, 245, 0.8);
+      color: #737373;
+      box-shadow: 0 6px rgba(0, 0, 0, 0.2);
+      -webkit-transition: none;
+      -moz-transition: none;
+      transition: none;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    input[type=radio] + label.btn:hover{
+      box-shadow: 0 4px #4d4d4d;
+      top: 2px;
+    }
+
+    input[type=radio]:checked + label.btn{
+      box-shadow: 0 0 #4d4d4d;
+      top: 6px;
       color: #333333;
     }
 
@@ -111,12 +165,23 @@
   <div id="map"></div>
 
   <!-- ####### UI RADIO CONTROLS ####### -->
+  <!-- <div id='ui-controls'>
+    <form>
+      <label>Choose Recreation Type:</br></label>
+       <input type="radio" name="trails" value="SUMMER_M" checked> Summer Trails<br>
+       <input type="radio" name="trails" value="WINTER_M"> Winter Trails
+    </form>
+  </div> -->
+
   <div id='ui-controls'>
-      <form>
-        <label>Choose Recreation Type:</br></label>
-         <input type="radio" name="trails" value="SUMMER_M" checked> Summer Trails<br>
-         <input type="radio" name="trails" value="WINTER_M"> Winter Trails
-      </form>
+    <form>
+      <!-- <label><ui>Choose Recreation Type:</ui></br></label> -->
+      <input type="radio" id="radio-btn-1" name="trails" value="SUMMER_M" checked>
+      <label for="radio-btn-1" class="btn">Summer Trails</label><br>
+
+      <input type="radio" id="radio-btn-2" name="trails" value="WINTER_M">
+      <label for="radio-btn-2" class="btn">Winter Trails</label>
+    </form>
   </div>
 
   <!-- ####### LOAD LEAFLET & JQUERY ####### -->
@@ -276,7 +341,9 @@
             })
           },
           onEachFeature: function(feature, layer) {
-            var popup = "<popup>" + feature.properties.Name + "</popup>"
+            // var symType = feature.properties.Name
+            var popup = "<popup>" + feature.properties.Name +
+                        " " + feature.properties.Type + "</popup>"
             layer.bindTooltip(popup)
           }
       }).addTo(map)
