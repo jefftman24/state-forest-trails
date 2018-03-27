@@ -25,7 +25,7 @@
       right: 15px;
       padding: 8px 15px;
       margin: 0;
-      color: #4d4d4d;
+      color: #006600;
       font-size: 2.4em;
       background: rgba(245, 245, 245, 0.8);
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
@@ -45,13 +45,6 @@
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
       border-radius: 5px;
     }
-
-    /* @media only screen and (max-width: 768px) { */
-        /* ####### FOR MOBILE DEVICES ONLY ####### */
-        /* [class*="h1"] {
-            font-size: 2.4em;                             ####### MESS W/ THIS LATER ########
-        }
-    } */
 
     popup {
       color: #004d00;
@@ -90,65 +83,37 @@
       bottom: 0;
     }
 
-    /* #ui-controls {
-      width: 176px;
-      padding: 8px 25px 8px 15px;
-      background: rgba(245, 245, 245, 0.8);
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-      border-radius: 5px;
-      font-weight: bold;
-      color: #333333;
-    } */
-
-    ui {
-      position: absolute;
-      z-index: 650;
-      bottom: 25px;
-      right: 15px;
-      padding: 8px 15px;
-      margin: 0;
-      font-size: 0.8em;
-      background: rgba(245, 245, 245, 0.8);
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-      border-radius: 5px;
-    }
-
     input[type=radio]{
       display:none;
     }
 
-
     input[type=radio] + label.btn{
-      padding: 5px 10px;
+      padding: 7.5px 15px;
       margin: 5px 10px;
       display: inline-block;
       text-transform: uppercase;
       font-weight: 700;
-      outline: none;
       position: relative;
       -webkit-transition: all 0.3s;
       -moz-transition: all 0.3s;
       transition: all 0.3s;
       background: rgba(245, 245, 245, 0.8);
       color: #737373;
-      box-shadow: 0 6px rgba(0, 0, 0, 0.2);
-      -webkit-transition: none;
-      -moz-transition: none;
-      transition: none;
-      border: none;
-      border-radius: 5px;
+      box-shadow: 0 4px rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
       cursor: pointer;
     }
 
     input[type=radio] + label.btn:hover{
       box-shadow: 0 4px #4d4d4d;
       top: 2px;
+      color: #333333;
     }
 
     input[type=radio]:checked + label.btn{
-      box-shadow: 0 0 #4d4d4d;
-      top: 6px;
-      color: #333333;
+      box-shadow: 0 4px #006600;
+      top: 0px;
+      color: #006600;
     }
 
   </style>
@@ -156,6 +121,7 @@
 
 <body>
 
+  <!-- ####### TITLE BLOCK ####### -->
   <h1>State Forest Trails Map</h1>
 
   <!-- ####### TRAIL COLOR TEXT LEGEND ####### -->
@@ -165,20 +131,10 @@
   <div id="map"></div>
 
   <!-- ####### UI RADIO CONTROLS ####### -->
-  <!-- <div id='ui-controls'>
-    <form>
-      <label>Choose Recreation Type:</br></label>
-       <input type="radio" name="trails" value="SUMMER_M" checked> Summer Trails<br>
-       <input type="radio" name="trails" value="WINTER_M"> Winter Trails
-    </form>
-  </div> -->
-
   <div id='ui-controls'>
     <form>
-      <!-- <label><ui>Choose Recreation Type:</ui></br></label> -->
       <input type="radio" id="radio-btn-1" name="trails" value="SUMMER_M" checked>
       <label for="radio-btn-1" class="btn">Summer Trails</label><br>
-
       <input type="radio" id="radio-btn-2" name="trails" value="WINTER_M">
       <label for="radio-btn-2" class="btn">Winter Trails</label>
     </form>
@@ -215,9 +171,6 @@
     // ####### SET GLOBAL VARIABLE FOR TRAIL LAYER #######
     var attributeValue = "SUMMER_M"
 
-    // ####### SET GLOBAL VARIABLE FOR GRAY SCALE TOOLTIP #######
-    //var grayVariable = "WINTER_M"
-
     // ####### REQUEST TILES & ADD TO MAP #######
     var tiles = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.{ext}', {
       attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
@@ -229,23 +182,13 @@
 
     // ####### CREATE VARIABLES FROM GEOJSON DATA #######
     var trailData = $.getJSON("data/trails.geojson"),
-      boundaryData = $.getJSON("data/park-boundary.geojson"),
-      parkRoadData = $.getJSON("data/park-roads.geojson"),
-      recSymbolData = $.getJSON("data/rec-symbols.geojson")
+        boundaryData = $.getJSON("data/park-boundary.geojson"),
+        parkRoadData = $.getJSON("data/park-roads.geojson"),
+        recSymbolData = $.getJSON("data/rec-symbols.geojson")
 
 
-    // ####### MAKE GEOJSON DATA AVAILABLE TO READY FUNCTION #######
-    $.when(trailData, boundaryData, parkRoadData, recSymbolData).then(ready);
-
-    function ready(trailData, boundaryData, parkRoadData, recSymbolData) {
-      L.geoJson(boundaryData)
-      L.geoJson(parkRoadData)
-      L.geoJson(recSymbolData)
-
-      // ####### CALL drawMap FUCTION #######
-      drawMap(trailData, boundaryData, parkRoadData,recSymbolData)
-
-    }
+    // ####### MAKE GEOJSON DATA AVAILABLE TO drawMap FUNCTION #######
+    $.when(trailData, boundaryData, parkRoadData, recSymbolData).then(drawMap);
 
 
     function drawMap(trailData, boundaryData, parkRoadData, recSymbolData) {
@@ -255,7 +198,7 @@
         style: function(feature) {
           return {
             color: 'green',
-            weight: 5,
+            weight: 7.5,
             opacity: 0.7,
             fillOpacity: 0
           };
@@ -271,8 +214,10 @@
         },
         style: function(feature) {
           return {
-            color: '#e65c00',
-            weight: 3
+            color: '#ff6600',
+            weight: 3,
+            dashArray: '5 2',
+            opacity: 0.8
           };
         },
       }).addTo(map)
@@ -287,7 +232,8 @@
         style: function(feature) {
           return {
             color: 'blue',
-            weight: 3
+            weight: 3,
+            opacity: 0.8
           };
         },
       }).addTo(map)
@@ -301,7 +247,7 @@
         },
         style: function(feature) {
           return {
-            color: 'orange',
+            color: '#ff6600',
             weight: 3
           };
         },
@@ -341,7 +287,6 @@
             })
           },
           onEachFeature: function(feature, layer) {
-            // var symType = feature.properties.Name
             var popup = "<popup>" + feature.properties.Name +
                         " " + feature.properties.Type + "</popup>"
             layer.bindTooltip(popup)
@@ -356,15 +301,14 @@
             })
           },
           onEachFeature: function(feature, layer) {
-            var popup = "<popup>" + feature.properties.Name + "</popup>"
+            var popup = "<popup>" + feature.properties.Name +
+                        " " + feature.properties.Type + "</popup>"
             layer.bindTooltip(popup)
           }
       })
 
       map.on('zoomend', function() {
           var currentZoom = map.getZoom();
-          // map.removeLayer(recSymbols),
-          // map.removeLayer(recSymbolsSm);
           console.log(currentZoom);
 
           if (currentZoom < 12) {
@@ -374,7 +318,6 @@
               map.removeLayer(recSymbolsSm),
               map.addLayer(recSymbols);
             }
-
       });
 
       // ####### CALL highlightTooltip FUNCTIONS #######
@@ -392,9 +335,7 @@
       var svg = ""
 
           // ####### ASSOCIATE SVG WITH REC SYMBOL LAYER TYPE ATTRIBUTE #######
-          if (type == "Building") {
-            svg =  "svgs/building.png";
-          } else if (type == "Campground") {
+          if (type == "Campground") {
             svg =  "svgs/campground.png";
           } else if (type == "Trailhead") {
             svg = "svgs/trailhead.png";
@@ -402,17 +343,20 @@
             svg = "svgs/parking.png";
           } else if (type == "Overlook") {
             svg = "svgs/overlook.png";
-          } else if (type == "Ranger") {
+          } else if (type == "Visitors Center") {
+            svg = "svgs/ranger.png";
+          } else if (type == "Entrance Station") {
             svg = "svgs/ranger.png";
           } else if (type == "Restroom") {
             svg = "svgs/restroom.png";
+          } else if (type == "Fee Station") {
+            svg =  "svgs/building.png";
           };
 
         // ####### CREATE ICON FROM SVG W/ THESE OPTIONS #######
         return L.icon({
           iconUrl: svg,
           iconSize: 27,
-          // iconSize: getIconSize(iconSize),
           popupAnchor: [0, -15],
           className: 'icon'
          })
@@ -426,9 +370,7 @@
       var svg = ""
 
           // ####### ASSOCIATE SVG WITH REC SYMBOL LAYER TYPE ATTRIBUTE #######
-          if (type == "Building") {
-            svg =  "svgs/building.png";
-          } else if (type == "Campground") {
+          if (type == "Campground") {
             svg =  "svgs/campground.png";
           } else if (type == "Trailhead") {
             svg = "svgs/trailhead.png";
@@ -436,34 +378,23 @@
             svg = "svgs/parking.png";
           } else if (type == "Overlook") {
             svg = "svgs/overlook.png";
-          } else if (type == "Ranger") {
+          } else if (type == "Visitors Center") {
+            svg = "svgs/ranger.png";
+          } else if (type == "Entrance Station") {
             svg = "svgs/ranger.png";
           } else if (type == "Restroom") {
             svg = "svgs/restroom.png";
+          } else if (type == "Fee Station") {
+            svg =  "svgs/building.png";
           };
 
         // ####### CREATE ICON FROM SVG W/ THESE OPTIONS #######
         return L.icon({
           iconUrl: svg,
           iconSize: 15,
-          // iconSize: getIconSize(iconSize),
           popupAnchor: [0, -15],
           className: 'icon'
          })
-
-    }
-
-
-    function getIconSize(iconSize) {
-
-        var currentZoom = map.getZoom();
-        var iconSize = ""
-
-        if (currentZoom > 12) {
-          iconSize = '20';
-        } else if (currentZoom < 12) {
-          iconSize = '30';
-        }
 
     }
 
@@ -484,7 +415,9 @@
 
         // ####### SET CORRECT COLOR OF ACTIVE dataLayer #######
         layer.setStyle({
-          color: 'orange'
+          color: '#ff6600',
+          opacity: 0.8,
+          dashArray: '10 5'
         });
 
         // ####### WHEN MOUSING OVER #######
@@ -502,8 +435,9 @@
 
           // ####### RESET LAYER STYLE TO ORIGIANL COLOR #######
           layer.setStyle({
-            color: 'orange',
-            weight: 3
+            color: '#ff6600',
+            weight: 3,
+            opacity: 0.8
           });
 
         }).addTo(map); // ####### ADD IT TO MAP #######
@@ -542,7 +476,9 @@
 
         // ####### SET CORRECT COLOR OF ACTIVE dataLayer #######
         layer.setStyle({
-          color: 'blue'
+          color: 'blue',
+          opacity: 0.8,
+          dashArray: '10 5'
         });
 
         // ####### WHEN MOUSING OVER #######
@@ -561,7 +497,8 @@
           // ####### RESET LAYER STYLE TO ORIGIANL COLOR #######
           layer.setStyle({
             color: 'blue',
-            weight: 3
+            weight: 3,
+            opacity: 0.8
           });
 
         }).addTo(map); // ####### ADD IT TO MAP #######
